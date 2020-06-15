@@ -32,15 +32,12 @@ print_var_analytics <- function(data_sd,
                                 conf_level_backtest=0.9,
                                 ticker="noname", type="none") {
 
-  n <- length(data_sd$Date)
+  n <- length(data_sd$R)
   alpha <- qnorm(1 - conf_level_var)
   VAR <- alpha * data_sd$SD
-  # VAR_ABS <- VAR + mean(data_sd$R)
 
   num_of_fails <- sum(as.numeric(data_sd$R < VAR))
-  # num_of_fails_abs <- sum(as.numeric(data_sd$R < VAR_ABS))
   rate <- num_of_fails / n
-  # rate_abs <- num_of_fails_abs / n
 
   mean_fails <- (1 - conf_level_var) * n
   sd_fails <- sqrt(conf_level_var * (1 - conf_level_var) * n)
@@ -56,7 +53,6 @@ print_var_analytics <- function(data_sd,
   cat("Cofidence interval at level",conf_level_backtest,"=",
       conf_interval_backtest[1], "...", conf_interval_backtest[2], "\n")
   cat("Number of fails =", num_of_fails, ", Rate =", rate, "\n")
-  # cat("Number of fails absolute =", num_of_fails_abs, ", Rate =", rate_abs, "\n")
 
 }
 

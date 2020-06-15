@@ -35,7 +35,7 @@ stock2 <- 3
 corr_12 <- c()
 corr_12_est <- c()
 
-plot_range <- 8000:8300
+plot_range <- 1000:2000
 
 for (t in plot_range) {
   SIGMA_t <- gogarch.find_conditional_SIGMA(factor_process$SD2, OMEGA, t)
