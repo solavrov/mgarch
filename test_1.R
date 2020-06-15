@@ -19,7 +19,7 @@ SIGMA_est <- gogarch.find_SIGMA_estim(R)
 OMEGA_est <- gogarch.find_OMEGA_estim(R, SIGMA_est, df=5)
 
 print(OMEGA)
-# print(OMEGA_est)
+print(OMEGA_est)
 print(gogarch.permutate_colunms(OMEGA_est, OMEGA))
 
 X_est <- gogarch.find_X_process_estim(R, OMEGA_est)
