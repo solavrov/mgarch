@@ -1,3 +1,6 @@
+options('stringsAsFactors'=FALSE)
+options("max.print"=50)
+
 library(mgarch)
 
 OMEGA <- rbind(c(-2, 1, 1),
