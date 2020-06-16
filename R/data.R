@@ -1,12 +1,4 @@
 
-#' global params
-#'
-#' @export
-DIR <- "C:/R/var/"
-#options('stringsAsFactors'=FALSE)
-#options("max.print"=50)
-
-
 #' load stock data from file
 #'
 #' @param file_px
@@ -18,7 +10,7 @@ DIR <- "C:/R/var/"
 #' @export
 #'
 #' @examples
-load_stock_data <- function(file_px, file_div, dir=DIR, div_factor=1) {
+load_stock_data <- function(file_px, file_div, dir=paste0(getwd(),"/data/"), div_factor=1) {
 
   # read and preprocess
   data_px <- read.csv(paste0(dir,file_px))
@@ -72,7 +64,7 @@ load_stock_data <- function(file_px, file_div, dir=DIR, div_factor=1) {
 #' @export
 #'
 #' @examples
-load_stock_data_by_ticker <- function(ticker, dir=DIR, div_factor=1) {
+load_stock_data_by_ticker <- function(ticker, dir=paste0(getwd(),"/data/"), div_factor=1) {
   file_px <- paste0(ticker, '/', ticker, "_price.csv")
   file_div <- paste0(ticker, '/', ticker, "_div.csv")
   df <- load_stock_data(file_px, file_div, dir, div_factor)
@@ -106,7 +98,7 @@ select_div_events <- function(data_stock) {
 #' @export
 #'
 #' @examples
-save_data <- function(data, file_name, dir=DIR) {
+save_data <- function(data, file_name, dir=paste0(getwd(),"/data/")) {
   write.csv(data, paste0(dir, file_name), row.names=FALSE)
 }
 
@@ -120,7 +112,7 @@ save_data <- function(data, file_name, dir=DIR) {
 #' @export
 #'
 #' @examples
-load_df <- function(file_name, dir=DIR) {
+load_df <- function(file_name, dir=paste0(getwd(),"/data/")) {
   df <- read.csv(paste0(dir, file_name))
   df$Date <- as.Date(df$Date, "%Y-%m-%d")
   return (df)
@@ -138,8 +130,9 @@ load_df <- function(file_name, dir=DIR) {
 #' @export
 #'
 #' @examples
-load_sd <- function(ticker, method, calc_win, dir=DIR) {
+load_sd <- function(ticker, method, calc_win, dir=paste0(getwd(),"/data/")) {
   file <- paste0(ticker, '/', ticker, '_sd_', method, '_', calc_win, ".csv")
   df <-  load_df(file, dir)
   return (df)
 }
+
