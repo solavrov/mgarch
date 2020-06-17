@@ -206,7 +206,7 @@ gogarch.find_SD2_estim <- function(X, gp) {
   SD2 <- c()
   for (i in 1:nrow(X)) {
     a0 <- 1 - gp$a[i] - gp$b[i]
-    SD2 <- rbind(SD2, get_h_garch(X[i,], a0, gp$a[i], gp$b[i]))
+    SD2 <- rbind(SD2, get_h_garch(X[i,], a0, gp$a[i], gp$b[i], extra_h=TRUE))
   }
   return (SD2)
 }
@@ -252,6 +252,36 @@ gogarch.permutate_colunms <- function(M, M0) {
   }
   return (M1)
 }
+
+
+#' calculate covariance matrix for given portfolio on given date
+#'
+#' @param los
+#' @param date
+#' @param calc_win
+#' @param df
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.calc_cov <- function(los, date, calc_win, df=5) {
+  j <- which(los[[1]]$Date == date)
+  k <- (j - calc_win):(j - 1)
+  R <- c()
+  for (e in los) R <- rbind(R, e$R[k])
+
+  SIGMA_est <- gogarch.find_SIGMA_estim(R)
+  OMEGA_est <- gogarch.find_OMEGA_estim(R, SIGMA_est, df)
+  X_est <- gogarch.find_X_process_estim(R, OMEGA_est)
+  gp <- gogarch.find_garch_param_estim(X_est)
+  SD2_est <- gogarch.find_SD2_estim(X_est, gp)
+  cov_matrix <- gogarch.find_conditional_SIGMA(SD2_est, OMEGA_est, ncol(SD2_est))
+
+  return (cov_matrix)
+}
+
+
 
 
 
