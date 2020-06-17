@@ -1,4 +1,5 @@
 
+
 #' calculate variances for given garch params
 #'
 #' @param r
@@ -6,15 +7,17 @@
 #' @param a1
 #' @param b
 #' @param h1
+#' @param extra_h
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_h_garch <- function(r, a0, a1, b, h1=var(r)) {
+get_h_garch <- function(r, a0, a1, b, h1=var(r), extra_h=FALSE) {
   h <- c()
   h[1] <- h1
-  for (i in 2:length(r)) h[i] <- a0 + a1 * r[i-1] ^ 2 + b * h[i-1]
+  if (extra_h) k <- 1 else k <- 0
+  for (i in 2:(length(r) + k)) h[i] <- a0 + a1 * r[i-1] ^ 2 + b * h[i-1]
   return (h)
 }
 
@@ -305,7 +308,7 @@ calc_sd_garch <- function(data_stock, calc_win=250, is_windowed=FALSE, ticker="n
     r <- data_stock$R[k:(calc_win + i)]
     h <- get_h_garch(r, g$a0, g$a1, g$b, h1=var(head(r, -1)))
     SD[i] <- sqrt(tail(h, 1))
-    if (i/n *100 > progress) {
+    if (i/n * 100 > progress) {
       cat(progress,"% ", sep = '')
       progress <- progress + 1
     }
