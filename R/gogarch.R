@@ -300,11 +300,16 @@ gogarch.calc_sd_port <- function(los, w, calc_win) {
 
   SD <- c()
   R <- c()
+  counter <- 1
   for (i in 1:n) {
     d <- los[[1]]$Date[calc_win + i]
     cov_matrix <- gogarch.calc_cov(los, d, calc_win)
     SD[i] <- sqrt(t(w) %*% cov_matrix %*% w)
     R[i] <- t(w) %*% get_r_vector(los, d)
+    if (i / n * 100 > counter) {
+      cat(counter,'% ', sep = '')
+      counter <- counter + 1
+    }
   }
 
   j <- (calc_win + 1):(calc_win + n)
