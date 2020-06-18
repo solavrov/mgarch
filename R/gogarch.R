@@ -282,6 +282,39 @@ gogarch.calc_cov <- function(los, date, calc_win, df=5) {
 }
 
 
+#' calculate gogarch SD for portfolio for moving window
+#'
+#' @param los
+#' @param w
+#' @param calc_win
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.calc_sd_port <- function(los, w, calc_win) {
+
+  w <- cbind(w)
+
+  n <- nrow(los[[1]]) - calc_win
+
+  SD <- c()
+  R <- c()
+  for (i in 1:n) {
+    d <- los[[1]]$Date[calc_win + i]
+    cov_matrix <- gogarch.calc_cov(los, d, calc_win)
+    SD[i] <- sqrt(t(w) %*% cov_matrix %*% w)
+    R[i] <- t(w) %*% get_r_vector(los, d)
+  }
+
+  j <- (calc_win + 1):(calc_win + n)
+
+  df <- data.frame(los[[1]]$Date[j], R, SD)
+  colnames(df) <- c("Date", "R", "SD")
+
+  return (df)
+
+}
 
 
 
