@@ -79,7 +79,10 @@ print_var_analytics <- function(data_sd,
 #' @examples
 draw_var_analytics <- function(data_sd,
                                conf_level_var=0.99 ,
+                               tail_len=length(data_sd$R),
                                ticker="noname", type="none") {
+
+  data_sd <- tail(data_sd, tail_len)
   alpha <- qnorm(1 - conf_level_var)
   varisk <- data_sd$SD * alpha
   ymin <- min(data_sd$R, varisk)
@@ -88,5 +91,6 @@ draw_var_analytics <- function(data_sd,
   lines(data_sd$Date, data_sd$R, type = 'h', col="blue")
   j <- which(data_sd$R < varisk)
   lines(data_sd$Date[j], data_sd$R[j], col="red", lty=0, type='o')
+
 }
 
