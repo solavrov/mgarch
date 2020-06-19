@@ -20,6 +20,7 @@ plot_div_gap_analytics <- function(data_stock, ticker="noname") {
 #' @param data_sd
 #' @param conf_level_var
 #' @param conf_level_backtest
+#' @param tail_len
 #' @param ticker
 #' @param type
 #'
@@ -30,9 +31,12 @@ plot_div_gap_analytics <- function(data_stock, ticker="noname") {
 print_var_analytics <- function(data_sd,
                                 conf_level_var=0.99 ,
                                 conf_level_backtest=0.9,
+                                tail_len=length(data_sd$R),
                                 ticker="noname", type="none") {
 
-  n <- length(data_sd$R)
+  data_sd <- tail(data_sd, tail_len)
+  n <- tail_len
+
   alpha <- qnorm(1 - conf_level_var)
   VAR <- alpha * data_sd$SD
 
@@ -50,8 +54,12 @@ print_var_analytics <- function(data_sd,
   cat("\n\nStock ticker:", ticker, "\n")
   cat("Analytics of", type, "method\n")
   cat("VAR at confidence", conf_level_var, "\n")
-  cat("Cofidence interval at level",conf_level_backtest,"=",
-      conf_interval_backtest[1], "...", conf_interval_backtest[2], "\n")
+  cat("Cofidence interval at level", conf_level_backtest,"=",
+      conf_interval_backtest[1],
+      "...",
+      round(mean_fails),
+      "...",
+      conf_interval_backtest[2], "\n")
   cat("Number of fails =", num_of_fails, ", Rate =", rate, "\n")
 
 }
