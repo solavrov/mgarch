@@ -23,5 +23,5 @@ sd_gogarch <- gogarch.calc_sd_port(l, w, calc_win = 1000)
 print_var_analytics(sd_simple, tail_len = 2200)
 print_var_analytics(sd_gogarch, tail_len = 2200)
 
-draw_var_analytics(sd_simple)
-draw_var_analytics(sd_gogarch)
+draw_var_analytics(sd_simple, tail_len = 2200)
+draw_var_analytics(sd_gogarch, tail_len = 2200)
