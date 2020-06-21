@@ -17,11 +17,13 @@ w <- c(0.3, 0.3, 0.2, 0.1, 0.1)
 # cv_gogarch <- gogarch.calc_cov(l, d, calc_win=1000, df=5)
 
 
-sd_simple <- calc_sd_port_simple(l, w, calc_win = 250)
+# sd_simple <- calc_sd_port_simple(l, w, calc_win = 250)
 sd_gogarch <- gogarch.calc_sd_port(l, w, calc_win = 1000)
+cov_data <- gogarch.calc_cov_data(l, calc_win = 1000)
+sd_gogarch_2 <- gogarch.calc_sd(cov_data, w)
 
-print_var_analytics(sd_simple, tail_len = 2200)
-print_var_analytics(sd_gogarch, tail_len = 2200)
-
-draw_var_analytics(sd_simple, tail_len = 2200)
-draw_var_analytics(sd_gogarch, tail_len = 2200)
+# print_var_analytics(sd_simple, tail_len = 2200)
+# print_var_analytics(sd_gogarch, tail_len = 2200)
+#
+# draw_var_analytics(sd_simple, tail_len = 2200)
+# draw_var_analytics(sd_gogarch, tail_len = 2200)
