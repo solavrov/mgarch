@@ -94,3 +94,40 @@ draw_var_analytics <- function(data_sd,
 
 }
 
+
+#' calculate mean correlation from covariance matrix
+#'
+#' @param cov_matrix
+#'
+#' @return
+#' @export
+#'
+#' @examples
+calc_mean_corr <- function(cov_matrix) {
+  n <- nrow(cov_matrix)
+  m <- sum(cov2cor(cov_matrix) - diag(n)) / (n^2 - n)
+  return (m)
+}
+
+
+#' draw mean correlation form covarience data
+#'
+#' @param cov_data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+draw_mean_corr <- function(cov_data) {
+  d <- as.Date(x = integer(0), origin = "1970-01-01")
+  m <- c()
+  for (i in 1:length(cov_data)) {
+    d[i] <- cov_data[[i]]$Date
+    m[i] <- calc_mean_corr(cov_data[[i]]$COV)
+  }
+  plot(d,m, type='l', col='blue', xlab="date", ylab="mean corr")
+}
+
+
+
+
