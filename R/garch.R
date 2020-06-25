@@ -1,5 +1,4 @@
 
-
 #' calculate variances for given garch params
 #'
 #' @param r
@@ -126,7 +125,6 @@ get_garch_estim <- function(r,
 }
 
 
-
 #' rough estimate garch params for a0=1-a1-b case
 #'
 #' @param r
@@ -221,7 +219,6 @@ get_garch_params <- function(r,
   g$b <- optim_result$par[3]
   return (g)
 }
-
 
 
 #' find garch params estimate for a0=1-a1-b case
