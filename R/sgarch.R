@@ -1,3 +1,58 @@
+
+#' sample of sdudent distribution
+#'
+#' @param n
+#' @param nu
+#' @param sd
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.rt <- function(n, nu, sd=1) {
+  return (sd * sqrt(1 - 2 / nu) * rt(n, nu) )
+}
+
+
+#' inverted probability distribution for student
+#'
+#' @param p
+#' @param nu
+#' @param sd
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.qt <- function(p, nu, sd=1) {
+  return (sd * sqrt(1 - 2 / nu) * qt(p, nu))
+}
+
+
+#' make garch process sample for student
+#'
+#' @param a0
+#' @param a1
+#' @param b
+#' @param nu
+#' @param n
+#' @param chisq_df
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.make_process_sample <- function(a0, a1, b, nu, n, chisq_df=3) {
+  h <- rchisq(1, chisq_df) / chisq_df
+  r <- sgarch.rt(1, nu, sqrt(h))
+  for (i in 2:n) {
+    h[i] <- a0 + a1 * r[i-1]^2 + b * h[i-1]
+    r[i] <- sgarch.rt(1, nu, sqrt(h[i]))
+  }
+  return (list(r=r, h=h))
+}
+
+
 #' calculate reversed likelihood for student distribution
 #'
 #' @param x
@@ -14,7 +69,8 @@ sgarch.get_rlh <- function(x, r, nu) {
   b <- x[3]
   h <- tail(get_h_garch(r, a0, a1, b),-1)
   r <- tail(r,-1)
-  return (sum(log(1 + r ^ 2 / h / (nu - 2))))
+  rlh <- sum(log(h) + (nu + 1) * log(1 + r ^ 2 / h / (nu - 2)))
+  return (rlh)
 }
 
 
@@ -85,8 +141,8 @@ sgarch.find_param_estim <- function(r,
 #'
 #' @examples
 sgarch.find_params <- function(r,
-                               init_par = sgarch.find_param_estim(r, nu),
                                nu,
+                               init_par = sgarch.find_param_estim(r, nu),
                                a0_min = 0,
                                a1_min = 0,
                                b_min = 0,
@@ -124,4 +180,67 @@ sgarch.find_params <- function(r,
   g$a1 <- optim_result$par[2]
   g$b <- optim_result$par[3]
   return (g)
+}
+
+
+
+
+#' calculate sd using garch for student
+#'
+#' @param data_stock
+#' @param nu
+#' @param calc_win
+#' @param is_windowed
+#' @param ticker
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.calc_sd <- function(data_stock, nu, calc_win=1000, is_windowed=TRUE, ticker="noname") {
+
+  n <- length(data_stock$Date) - calc_win
+
+  sd <- c()
+  a0 <- c()
+  a1 <- c()
+  b <- c()
+
+  if (is_windowed) comment <- "window" else comment <- ''
+  cat("\n\nDoing", ticker, "\n")
+  cat("student\'s garch", comment, "progress: 0% ")
+  progress <- 1
+  for (i in 1:n) {
+    if (is_windowed) k <- i else k <- 1
+    r <- data_stock$R[k:(calc_win + i - 1)]
+    if (i==1) {
+      g <- sgarch.find_params(r, nu)
+    } else {
+      g <- sgarch.find_params(r, nu, c(a0[i-1], a1[i-1], b[i-1]))
+    }
+    a0[i] <- g$a0
+    a1[i] <- g$a1
+    b[i] <- g$b
+    r <- data_stock$R[k:(calc_win + i)]
+    h <- get_h_garch(r, g$a0, g$a1, g$b, h1=var(head(r, -1)))
+    sd[i] <- sqrt(tail(h, 1))
+    if (i/n * 100 > progress) {
+      cat(progress,"% ", sep = '')
+      progress <- progress + 1
+    }
+  }
+
+  j <- (calc_win + 1):length(data_stock$Date)
+
+  df <- data.frame(data_stock$Date[j],
+                   data_stock$R[j],
+                   sd,
+                   a0,
+                   a1,
+                   b
+  )
+  colnames(df) <- c("Date", "R", "SD", "a0", "a1", "b")
+
+  return (df)
+
 }
