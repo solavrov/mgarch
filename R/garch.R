@@ -1,4 +1,27 @@
 
+#' make garch process sample
+#'
+#' @param a0
+#' @param a1
+#' @param b
+#' @param n
+#' @param chisq_df
+#'
+#' @return
+#' @export
+#'
+#' @examples
+garch.make_process_sample <- function(a0, a1, b, n, chisq_df=3) {
+  h <- rchisq(1, chisq_df) / chisq_df
+  r <- rnorm(1, sd = sqrt(h))
+  for (i in 2:n) {
+    h[i] <- a0 + a1 * r[i-1]^2 + b * h[i-1]
+    r[i] <- rnorm(1, sd = sqrt(h[i]))
+  }
+  return (list(r=r, h=h))
+}
+
+
 #' calculate variances for given garch params
 #'
 #' @param r
@@ -278,7 +301,7 @@ garch.find_params_2 <- function(r,
 #' @export
 #'
 #' @examples
-calc_sd_garch <- function(data_stock, calc_win=250, is_windowed=FALSE, ticker="noname") {
+calc_sd_garch <- function(data_stock, calc_win=1000, is_windowed=TRUE, ticker="noname") {
 
   n <- length(data_stock$Date) - calc_win
 
