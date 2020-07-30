@@ -22,6 +22,39 @@ plot_div_gap_analytics <- function(data_stock, ticker = "noname") {
 
 
 
+#' calculate p-value - prob to get given extrim if model correct
+#'
+#' @param data_sd
+#' @param conf_level_var
+#' @param tail_len
+#'
+#' @return
+#' @export
+#'
+#' @examples
+analytics.p_value <- function(data_sd,
+                              conf_level_var = 0.99,
+                              tail_len = length(data_sd$R)) {
+
+  data_sd <- tail(data_sd, tail_len)
+  n <- tail_len
+
+  alpha <- qnorm(1 - conf_level_var)
+  VAR <- alpha * data_sd$SD
+
+  num_of_fails <- sum(as.numeric(data_sd$R < VAR))
+  rate <- num_of_fails / n
+
+  mean_fails <- (1 - conf_level_var) * n
+  sd_fails <- sqrt(conf_level_var * (1 - conf_level_var) * n)
+  p_left <- pnorm(num_of_fails, mean = mean_fails, sd = sd_fails)
+  p_value <- 2 * min(p_left, 1 - p_left)
+
+  return (p_value)
+
+}
+
+
 #' print var analytics
 #'
 #' @param data_sd
@@ -36,11 +69,12 @@ plot_div_gap_analytics <- function(data_stock, ticker = "noname") {
 #'
 #' @examples
 print_var_analytics <- function(data_sd,
-                                conf_level_var = 0.99 ,
+                                conf_level_var = 0.99,
                                 conf_level_backtest = 0.9,
                                 tail_len = length(data_sd$R),
                                 ticker = "noname",
                                 type = "none") {
+
   data_sd <- tail(data_sd, tail_len)
   n <- tail_len
 
@@ -57,6 +91,8 @@ print_var_analytics <- function(data_sd,
     mean_fails + alpha_backtest * sd_fails,
     mean_fails - alpha_backtest * sd_fails
   ))
+  p_left <- pnorm(num_of_fails, mean=mean_fails, sd=sd_fails)
+  p_value <- 2 * min(p_left, 1 - p_left)
 
   cat("\n\nStock ticker:", ticker, "\n")
   cat("Analytics of", type, "method\n")
@@ -73,6 +109,7 @@ print_var_analytics <- function(data_sd,
     "\n"
   )
   cat("Number of fails =", num_of_fails, ", Rate =", rate, "\n")
+  cat("p-value =", p_value, '\n')
 
 }
 
@@ -93,7 +130,7 @@ print_var_analytics <- function(data_sd,
 #' @examples
 print_var_analytics_student <- function(data_sd,
                                         nu,
-                                        conf_level_var = 0.99 ,
+                                        conf_level_var = 0.99,
                                         conf_level_backtest = 0.9,
                                         tail_len = length(data_sd$R),
                                         ticker = "noname",
@@ -135,9 +172,6 @@ print_var_analytics_student <- function(data_sd,
 }
 
 
-
-
-
 #' draw var analytics
 #'
 #' @param data_sd
@@ -150,7 +184,7 @@ print_var_analytics_student <- function(data_sd,
 #'
 #' @examples
 draw_var_analytics <- function(data_sd,
-                               conf_level_var = 0.99 ,
+                               conf_level_var = 0.99,
                                tail_len = length(data_sd$R),
                                ticker = "noname",
                                type = "none") {
