@@ -292,7 +292,7 @@ gogarch.calc_cov <- function(los, date, calc_win, df=5) {
 #' @export
 #'
 #' @examples
-gogarch.calc_cov_data <- function(los, calc_win) {
+gogarch.calc_cov_data <- function(los, calc_win, df=5) {
 
   n <- nrow(los[[1]]) - calc_win
 
@@ -302,7 +302,7 @@ gogarch.calc_cov_data <- function(los, calc_win) {
   progress <- 1
   for (i in 1:n) {
     d <- los[[1]]$Date[calc_win + i]
-    cov_matrix <- gogarch.calc_cov(los, d, calc_win)
+    cov_matrix <- gogarch.calc_cov(los, d, calc_win, df)
     cov_data[[i]] <- list(Date=d, COV=cov_matrix, r_vector=get_r_vector(los, d))
     if (i / n * 100 > progress) {
       cat(progress,'% ', sep = '')

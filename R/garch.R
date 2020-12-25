@@ -11,8 +11,8 @@
 #' @export
 #'
 #' @examples
-garch.make_process_sample <- function(a0, a1, b, n, chisq_df=3) {
-  h <- rchisq(1, chisq_df) / chisq_df
+garch.make_process_sample <- function(a0, a1, b, n, chisq_df=3, h0=0) {
+  if (h0 > 0) h <- h0 else h <- rchisq(1, chisq_df) / chisq_df
   r <- rnorm(1, sd = sqrt(h))
   for (i in 2:n) {
     h[i] <- a0 + a1 * r[i-1]^2 + b * h[i-1]

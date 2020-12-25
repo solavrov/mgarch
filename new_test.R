@@ -10,7 +10,7 @@ OMEGA <- rbind(c(-2, 1, 1),
 a <- c(0.2, 0.3, 0.05)
 b <- c(0.3, 0.6, 0.9)
 
-n <- 10^4
+n <- 10^6
 
 SIGMA <- OMEGA %*% t(OMEGA)
 
@@ -33,6 +33,7 @@ print(gp)
 SD2_est <- gogarch.find_SD2_estim(X_est, gp)
 
 t <- n/2
+
 SIGMA_t <- gogarch.find_conditional_SIGMA(factor_process$SD2, OMEGA, t)
 SIGMA_t_est <- gogarch.find_conditional_SIGMA(SD2_est, OMEGA_est, t)
 
@@ -40,6 +41,4 @@ print(SIGMA_t)
 print(SIGMA_t_est)
 print(cov2cor(SIGMA_t))
 print(cov2cor(SIGMA_t_est))
-
-
 
