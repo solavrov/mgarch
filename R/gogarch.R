@@ -33,6 +33,25 @@ gogarch.make_factor_process_sample <- function(a, b, n, chisq_df=3) {
 }
 
 
+#' make sample of list of stocks
+#'
+#' @param R
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.make_los_sample <- function(R) {
+  m <- nrow(R)
+  n <- ncol(R)
+  dates <- seq(Sys.Date(), Sys.Date() + n - 1, by=1)
+  x <- list()
+  for (i in 1:m)
+    x[[i]] <- data.frame(Date=dates, R=R[i,])
+  return(x)
+}
+
+
 #' find sigma estimate
 #'
 #' @param r
@@ -237,20 +256,17 @@ gogarch.find_conditional_SIGMA <- function(SD2, OMEGA, t) {
 #'
 #' @examples
 gogarch.permutate_colunms <- function(M, M0) {
-  M1 <- c()
-  for (i in 1:ncol(M0)) {
-    p <- t(M) %*% M0[,1]
-    k <- which.max(abs(p))
-    M1 <- cbind(M1, M[,k] * sign(p[k]))
-    if (ncol(M0) > 2) {
-      M0 <- M0[,-1]
-      M <- M[,-k]
-    } else {
-      M0 <- matrix(M0[,-1])
-      M <- matrix(M[,-k])
-    }
+  S <- t(M) %*% M0
+  P <- abs(S)
+  I <- matrix(rep(1, length(P)), nrow = nrow(P), ncol = ncol(P))
+  while (max(P) >= 0) {
+    ind <- which(P==max(P), arr.ind = TRUE)[1,]
+    P[ind['row'],] <- rep(-2, ncol(P))
+    P[,ind['col']] <- rep(-2, nrow(P))
+    P[ind['row'], ind['col']] <- -1
   }
-  return (M1)
+  P <- (P + 2 * I) * sign(S)
+  return (M %*% P)
 }
 
 
