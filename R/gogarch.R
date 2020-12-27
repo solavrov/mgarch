@@ -33,6 +33,28 @@ gogarch.make_factor_process_sample <- function(a, b, n, chisq_df=3) {
 }
 
 
+#' make samples true covariance data
+#'
+#' @param fp factor_process
+#' @param OMEGA
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.make_sample_true_cov_data <- function(fp, OMEGA) {
+  cov_data <- list()
+  R <- OMEGA %*% fp$X
+  d <- as.Date("2100-01-01")
+  for (i in 1:n) {
+    cov_matrix <- OMEGA %*% diag(fp$SD2[,i]) %*% t(OMEGA)
+    cov_data[[i]] <- list(Date=d, COV=cov_matrix, r_vector=R[,i])
+    d <- d + 1
+  }
+  return (cov_data)
+}
+
+
 #' make sample of list of stocks
 #'
 #' @param R
@@ -44,7 +66,9 @@ gogarch.make_factor_process_sample <- function(a, b, n, chisq_df=3) {
 gogarch.make_los_sample <- function(R) {
   m <- nrow(R)
   n <- ncol(R)
-  dates <- seq(Sys.Date(), Sys.Date() + n - 1, by=1)
+  dates <- seq(as.Date("2100-01-01"),
+               as.Date("2100-01-01") + n - 1,
+               by=1)
   x <- list()
   for (i in 1:m)
     x[[i]] <- data.frame(Date=dates, R=R[i,])
@@ -315,14 +339,17 @@ gogarch.calc_cov_data <- function(los, calc_win, df=5) {
   cov_data <- list()
 
   cat("Doing go-garch, progress: 0% ")
-  progress <- 1
+  progress <- 0
   for (i in 1:n) {
     d <- los[[1]]$Date[calc_win + i]
     cov_matrix <- gogarch.calc_cov(los, d, calc_win, df)
     cov_data[[i]] <- list(Date=d, COV=cov_matrix, r_vector=get_r_vector(los, d))
-    if (i / n * 100 > progress) {
+
+    progress_current <- round(i / n * 100)
+    if (progress_current > progress &
+        round(progress_current - progress) >= 1) {
+      progress <- progress_current
       cat(progress,'% ', sep = '')
-      progress <- progress + 1
     }
   }
 

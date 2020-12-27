@@ -229,7 +229,7 @@ calc_mean_corr <- function(cov_matrix) {
 }
 
 
-#' draw mean correlation form covarience data
+#' draw mean correlation from covarience data
 #'
 #' @param cov_data
 #'
