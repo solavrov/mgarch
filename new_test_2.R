@@ -1,3 +1,7 @@
+# experiment how go-garch is good for VaR for pure go-garch
+# in comparision with true cov matrices and
+# simple method
+
 options('stringsAsFactors'=FALSE)
 options("max.print"=50)
 
@@ -8,16 +12,19 @@ OMEGA <- rbind(c(-2, 1, 1),
                c(1, -1, 2),
                c(3, 0, 1))
 
-a <- c(0.1, 0.2, 0.05)
-b <- c(0.8, 0.6, 0.9)
+a <- c(0.25, 0.49, 0.38)
+b <- c(0.7, 0.5, 0.6)
 
-n <- 4250
+n <- 3750
 calc_win <- 1250
 
 fp <- gogarch.make_factor_process_sample(a, b, n)
+R <- OMEGA %*% fp$X
 los <- gogarch.make_los_sample(OMEGA %*% fp$X)
 
-cov_data_true <- gogarch.make_sample_true_cov_data(fp, OMEGA)
+cov_data_true <- gogarch.make_sample_true_cov_data(fp,
+                                                   OMEGA,
+                                                   calc_win + 1)
 cov_data <- gogarch.calc_cov_data(los, calc_win)
 
 w <- c(0.3, 0.3, 0.4)
@@ -36,4 +43,5 @@ for (p in cls) {
   print_var_analytics(sd_simple_1250, p, ticker = 'simple_1250')
 }
 
-beep(3)
+beep(5)
+

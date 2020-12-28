@@ -1,3 +1,6 @@
+# experiment how good go-garch in
+# finding params estimates of pure go-garch process
+
 options('stringsAsFactors'=FALSE)
 options("max.print"=50)
 
@@ -7,8 +10,11 @@ OMEGA <- rbind(c(-2, 1, 1),
                c(1, -1, 2),
                c(3, 0, 1))
 
-a <- c(0.1, 0.2, 0.05)
-b <- c(0.8, 0.6, 0.9)
+# a <- c(0.1, 0.2, 0.05)
+# b <- c(0.8, 0.6, 0.9)
+
+a <- c(0.25, 0.49, 0.38)
+b <- c(0.7, 0.5, 0.6)
 
 n <- 1250
 

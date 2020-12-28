@@ -35,20 +35,22 @@ gogarch.make_factor_process_sample <- function(a, b, n, chisq_df=3) {
 
 #' make samples true covariance data
 #'
-#' @param fp factor_process
+#' @param fp
 #' @param OMEGA
+#' @param start index of fp to start from
 #'
 #' @return
 #' @export
 #'
 #' @examples
-gogarch.make_sample_true_cov_data <- function(fp, OMEGA) {
+gogarch.make_sample_true_cov_data <- function(fp, OMEGA, start=1) {
   cov_data <- list()
   R <- OMEGA %*% fp$X
-  d <- as.Date("2100-01-01")
-  for (i in 1:n) {
+  d <- as.Date("2100-01-01") + start - 1
+  for (i in start:ncol(fp$X)) {
     cov_matrix <- OMEGA %*% diag(fp$SD2[,i]) %*% t(OMEGA)
-    cov_data[[i]] <- list(Date=d, COV=cov_matrix, r_vector=R[,i])
+    cov_data[[i - start + 1]] <-
+      list(Date=d, COV=cov_matrix, r_vector=R[,i])
     d <- d + 1
   }
   return (cov_data)
@@ -99,7 +101,12 @@ gogarch.find_SIGMA_estim <- function(R) {
 #' @examples
 gogarch.decompose_matrix <- function(M) {
   e <- eigen(M)
-  return (list(U=e$vectors, L=diag(e$values)))
+  U=e$vectors
+  if (length(e$values) > 1)
+    L = diag(e$values)
+  else
+    L = matrix(e$values)
+  return (list(U=U, L=L))
 }
 
 
