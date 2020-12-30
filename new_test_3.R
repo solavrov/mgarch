@@ -1,6 +1,6 @@
 # experiment how go-garch is good for VaR for pure go-garch
 # in comparision with true cov matrices and
-# simple method
+# simple method for big m
 
 
 options('stringsAsFactors'=FALSE)
@@ -9,14 +9,15 @@ options("max.print"=50)
 library(mgarch)
 library(beepr)
 
-OMEGA <- rbind(c(-2, 1, 1),
-               c(1, -1, 2),
-               c(3, 0, 1))
+m <- 20
+params <- gogarch.make_rand_params(m)
+print(params)
 
-a <- c(0.25, 0.49, 0.38)
-b <- c(0.7, 0.5, 0.6)
+OMEGA <- params$OMEGA
+a <- params$a
+b <- params$b
 
-n <- 3750
+n <- 3250
 calc_win <- 1250
 
 fp <- gogarch.make_factor_process_sample(a, b, n)
@@ -28,7 +29,7 @@ cov_data_true <- gogarch.make_sample_true_cov_data(fp,
                                                    calc_win + 1)
 cov_data <- gogarch.calc_cov_data(los, calc_win)
 
-w <- c(0.3, 0.3, 0.4)
+w <- rep(1, m) / m
 
 sd_true <- gogarch.calc_sd(cov_data_true, w)
 sd_garch <- gogarch.calc_sd(cov_data, w)

@@ -1,20 +1,28 @@
 # experiment how good go-garch in
 # finding params estimates of pure go-garch process
 
+
 options('stringsAsFactors'=FALSE)
 options("max.print"=50)
 
 library(mgarch)
+library(beepr)
 
-OMEGA <- rbind(c(-2, 1, 1),
-               c(1, -1, 2),
-               c(3, 0, 1))
+# OMEGA <- rbind(c(-2, 1, 1),
+#                c(1, -1, 2),
+#                c(3, 0, 1))
+#
+# # a <- c(0.1, 0.2, 0.05)
+# # b <- c(0.8, 0.6, 0.9)
+#
+# a <- c(0.25, 0.49, 0.38)
+# b <- c(0.7, 0.5, 0.6)
 
-# a <- c(0.1, 0.2, 0.05)
-# b <- c(0.8, 0.6, 0.9)
+params <- gogarch.make_rand_params(3)
 
-a <- c(0.25, 0.49, 0.38)
-b <- c(0.7, 0.5, 0.6)
+OMEGA <- params$OMEGA
+a <- params$a
+b <- params$b
 
 n <- 1250
 
@@ -35,6 +43,8 @@ print(OMEGA_est)
 X_est <- gogarch.find_X_process_estim(R, OMEGA_est)
 gp <- gogarch.find_garch_param_estim(X_est)
 
+print(params$a)
+print(params$b)
 print(gp)
 
 SD2_est <- gogarch.find_SD2_estim(X_est, gp)
@@ -101,3 +111,4 @@ lines(var_2_est, type='l', col='red', lwd=1)
 plot(var_3, type='l', col='gray', lwd=4)
 lines(var_3_est, type='l', col='red', lwd=1)
 
+beep(5)

@@ -1,4 +1,25 @@
 
+#' make random go-garch params
+#'
+#' @param m
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.make_rand_params <- function(m) {
+  OMEGA <- c()
+  while (TRUE) {
+    OMEGA <- matrix(sample(seq(-3, 3, 1), m*m ,replace = TRUE), m, m)
+    if (det(OMEGA) != 0) break
+    OMEGA <- matrix()
+  }
+  b <- sample(seq(0.60, 0.95, 0.01), m, replace = TRUE)
+  a <- sample(seq(0.96, 0.99, 0.01), m, replace = TRUE) - b
+  return (list(OMEGA=OMEGA, a=a, b=b))
+}
+
+
 #' make sample of factor processes for go-garch
 #'
 #' @param a

@@ -1,5 +1,5 @@
 
-#' sample of sdudent distribution
+#' sample of student distribution
 #'
 #' @param n
 #' @param nu
