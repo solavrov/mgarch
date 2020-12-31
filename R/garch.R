@@ -161,28 +161,30 @@ get_garch_estim <- function(r,
 #'
 #' @examples
 garch.find_param_estim_2 <- function(r,
-                                      a=c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
-                                      b=c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99),
-                                      n_desize=0,
-                                      timer_on=FALSE) {
-  if (timer_on) t1 <- Sys.time()
+                                     a = c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+                                     b = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99),
+                                     n_desize = 0,
+                                     timer_on = FALSE) {
+  if (timer_on)
+    t1 <- Sys.time()
   a <- desize(a, n_desize)
   b <- desize(b, n_desize)
   min_rlh <- garch.get_rlh_2(c(a[1], b[1]), r)
   min_params <- c(a[1], b[1])
   for (k in 1:length(b)) {
     for (j in 1:length(a)) {
-        if ((j==1 & k==1) | a[j]+b[k]>=1) next
-        rlh <- garch.get_rlh_2(c(a[j], b[k]), r)
-        if (rlh < min_rlh) {
-          min_rlh <- rlh
-          min_params <- c(a[j], b[k])
+      if ((j == 1 & k == 1) | a[j] + b[k] >= 1)
+        next
+      rlh <- garch.get_rlh_2(c(a[j], b[k]), r)
+      if (rlh < min_rlh) {
+        min_rlh <- rlh
+        min_params <- c(a[j], b[k])
       }
     }
   }
   if (timer_on) {
     t2 <- Sys.time()
-    print(t2-t1)
+    print(t2 - t1)
   }
   return (min_params)
 }

@@ -54,6 +54,43 @@ gogarch.make_factor_process_sample <- function(a, b, n, chisq_df=3) {
 }
 
 
+#' make sample of factor processes for go-garch for student
+#'
+#' @param a
+#' @param b
+#' @param n
+#' @param nu
+#' @param chisq_df
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.make_factor_process_sample_student <-
+  function(a, b, n, nu=6, chisq_df=3) {
+
+  X <- c()
+  SD2 <- c()
+  m <- length(a)
+
+  for (j in 1:m) {
+    sd2_j <- rchisq(1, chisq_df) / chisq_df
+    x_j <- sgarch.rt(1, nu, sd = sqrt(sd2_j))
+    a0 <- (1 - a[j] - b[j])
+    for (i in 2:n) {
+      sd2_j[i] <- a0 + a[j] * x_j[i-1]^2 + b[j] * sd2_j[i-1]
+      x_j[i] <- sgarch.rt(1, nu, sd = sqrt(sd2_j[i]))
+    }
+    X <- rbind(X, x_j, deparse.level = 0)
+    SD2 <- rbind(SD2, sd2_j, deparse.level = 0)
+  }
+
+  return (list(X=X, SD2=SD2))
+
+}
+
+
+
 #' make samples true covariance data
 #'
 #' @param fp
@@ -257,6 +294,28 @@ gogarch.find_garch_param_estim <- function(X) {
   b <- c()
   for (i in 1:nrow(X)) {
     gp <- garch.find_params_2(X[i,])
+    a[i] <- gp$a
+    b[i] <- gp$b
+  }
+  return (list(a=a, b=b))
+}
+
+
+
+#' find estimates of garch params for factor processes for student
+#'
+#' @param X
+#' @param nu
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gogarch.find_garch_param_estim_student <- function(X, nu) {
+  a <- c()
+  b <- c()
+  for (i in 1:nrow(X)) {
+    gp <- sgarch.find_params_2(X[i,], nu)
     a[i] <- gp$a
     b[i] <- gp$b
   }

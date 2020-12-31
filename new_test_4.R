@@ -1,5 +1,7 @@
 # experiment how good go-garch in
-# finding params estimates of pure go-garch process
+# finding params estimates of pure go-garch process for student
+#
+# n=10^7 - almost perfect result
 
 
 options('stringsAsFactors'=FALSE)
@@ -12,9 +14,6 @@ library(beepr)
 #                c(1, -1, 2),
 #                c(3, 0, 1))
 #
-# # a <- c(0.1, 0.2, 0.05)
-# # b <- c(0.8, 0.6, 0.9)
-#
 # a <- c(0.25, 0.49, 0.38)
 # b <- c(0.7, 0.5, 0.6)
 
@@ -24,11 +23,12 @@ OMEGA <- params$OMEGA
 a <- params$a
 b <- params$b
 
-n <- 10^5
+n <- 10^7
+nu <- 6
 
 SIGMA <- OMEGA %*% t(OMEGA)
 
-factor_process <-  gogarch.make_factor_process_sample(a, b, n)
+factor_process <- gogarch.make_factor_process_sample_student(a, b, n, nu)
 R <- OMEGA %*% factor_process$X
 
 SIGMA_est <- gogarch.find_SIGMA_estim(R)
@@ -41,7 +41,7 @@ print(OMEGA)
 print(OMEGA_est)
 
 X_est <- gogarch.find_X_process_estim(R, OMEGA_est)
-gp <- gogarch.find_garch_param_estim(X_est)
+gp <- gogarch.find_garch_param_estim_student(X_est, nu)
 
 print(a)
 print(b)
@@ -68,7 +68,7 @@ var_2_est <- c()
 var_3 <- c()
 var_3_est <- c()
 
-plot_range <- 500:1000
+plot_range <- 10500:11000
 
 for (t in plot_range) {
   SIGMA_t <- gogarch.find_conditional_SIGMA(factor_process$SD2, OMEGA, t)

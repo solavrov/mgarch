@@ -74,6 +74,27 @@ sgarch.get_rlh <- function(x, r, nu) {
 }
 
 
+
+#' calculate reversed likelihood for student distribution for a0=1-a1-b case
+#'
+#' @param x
+#' @param r
+#' @param nu
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.get_rlh_2 <- function(x, r, nu) {
+  a <- x[1]
+  b <- x[2]
+  h <- tail(get_h_garch(r, 1-a-b, a, b), -1)
+  r <- tail(r, -1)
+  rlh <- sum(log(h) + (nu + 1) * log(1 + r ^ 2 / h / (nu - 2)))
+  return (rlh)
+}
+
+
 #' rough estimate garch params student
 #'
 #' @param r
@@ -122,6 +143,49 @@ sgarch.find_param_estim <- function(r,
   return (min_params)
 }
 
+
+#' rough estimate garch params student for a0=1-a1-b case
+#'
+#' @param r
+#' @param nu
+#' @param a
+#' @param b
+#' @param n_desize
+#' @param timer_on
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.find_param_estim_2 <- function(r,
+                                      nu,
+                                      a = c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+                                      b = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99),
+                                      n_desize = 0,
+                                      timer_on = FALSE) {
+  if (timer_on)
+    t1 <- Sys.time()
+  a <- desize(a, n_desize)
+  b <- desize(b, n_desize)
+  min_rlh <- sgarch.get_rlh_2(c(a[1], b[1]), r, nu)
+  min_params <- c(a[1], b[1])
+  for (k in 1:length(b)) {
+    for (j in 1:length(a)) {
+      if ((j == 1 & k == 1) | a[j] + b[k] >= 1)
+        next
+      rlh <- sgarch.get_rlh_2(c(a[j], b[k]), r, nu)
+      if (rlh < min_rlh) {
+        min_rlh <- rlh
+        min_params <- c(a[j], b[k])
+      }
+    }
+  }
+  if (timer_on) {
+    t2 <- Sys.time()
+    print(t2 - t1)
+  }
+  return (min_params)
+}
 
 #' find garch params estimate for student
 #'
@@ -183,6 +247,52 @@ sgarch.find_params <- function(r,
 }
 
 
+#' find garch params estimate for student for a0=1-a1-b case
+#'
+#' @param r
+#' @param nu
+#' @param init_par
+#' @param a_min
+#' @param b_min
+#' @param a_max
+#' @param b_max
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sgarch.find_params_2 <- function(r,
+                                 nu,
+                                 init_par = sgarch.find_param_estim_2(r, nu),
+                                 a_min = 0,
+                                 b_min = 0,
+                                 a_max = 1,
+                                 b_max = 1) {
+  g <- list()
+  optim_result <- constrOptim(
+    init_par,
+    sgarch.get_rlh_2,
+    grad = NULL,
+    ui = rbind(c(1, 0),
+               c(0, 1),
+               c(-1, 0),
+               c(0, -1),
+               c(-1, -1)),
+    ci = c(a_min,
+           b_min,-a_max,-b_max,-1),
+    mu = 1e-04,
+    control = list(),
+    method = "Nelder-Mead",
+    outer.iterations = 100,
+    outer.eps = 1e-05,
+    r,
+    nu,
+    hessian = FALSE
+  )
+  g$a <- optim_result$par[1]
+  g$b <- optim_result$par[2]
+  return (g)
+}
 
 
 #' calculate sd using garch for student
